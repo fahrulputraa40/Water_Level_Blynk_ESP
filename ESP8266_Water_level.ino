@@ -16,6 +16,7 @@ const char* pass = "lojajar142";
 const char* notifMessage;
 const char* notif1 = "Air Keluar";
 const char* notif2 = "Air Tidak Keluar";
+const char* notif3 = "Air dimatikan";
 
 
 unsigned long waterTimeout;
@@ -26,6 +27,8 @@ struct {
   unsigned long timeOut;
   uint8_t update;
 } notif;
+
+unsigned long timer_waterOn;
 
 void setup() {
   // put your setup code here, to run once:
@@ -158,6 +161,7 @@ void loop() {
         notif.update = 1;
         notifMessage = notif1;
       }
+      timer_waterOn = millis();
     }
   }
   else if (lastButtonState == 3) {
@@ -166,10 +170,21 @@ void loop() {
       if (notif.update == 0) {
         notif.update = 1;
         notifMessage = notif2;
-        relayIs(LOW); //Turn off relay
-        lastButtonState = 255; //interlock button, the water not flow
+      }
+      relayIs(LOW); //Turn off relay
+      lastButtonState = 255; //interlock button, the water not flow
+    }
+    else if(millis() - timer_waterOn > (30*60000)){
+      relayIs(LOW); //Turn off relay
+      lastButtonState = 255; //interlock button, the water not flow
+      if (notif.update == 0) {
+        notif.update = 1;
+        notifMessage = notif3;
       }
     }
+  }
+  else{
+    relayIs(LOW); //Turn off relay
   }
   delay(500);
 }
